@@ -1,31 +1,33 @@
-import { TestBed } from '@angular/core/testing';
+import { createComponentFactory, byTestId } from '@ngneat/spectator';
+import { of } from 'rxjs';
 import { AppComponent } from './app.component';
+import { MessageService } from './message.service';
 
 describe('AppComponent', () => {
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [AppComponent],
-    }).compileComponents();
+  const createComponent = createComponentFactory({
+    component: AppComponent,
+    providers: [
+      // the spec fails if there is not provider mocked at this level
+      {
+        provide: MessageService,
+        useValue: {
+          getMessage: () => of('hi'),
+        },
+      },
+    ],
   });
 
   it('should create the app', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app).toBeTruthy();
-  });
-
-  it(`should have as title 'demoapp'`, () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app.title).toEqual('demoapp');
-  });
-
-  it('should render title', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    fixture.detectChanges();
-    const compiled = fixture.nativeElement;
-    expect(compiled.querySelector('h1').textContent).toContain(
-      'Welcome to demoapp!'
-    );
+    const spectator = createComponent({
+      providers: [
+        {
+          provide: MessageService,
+          useValue: {
+            getMessage: () => of('hi there'),
+          },
+        },
+      ],
+    });
+    expect(spectator.query(byTestId('hello-msg')).innerHTML).toBe('hi there');
   });
 });

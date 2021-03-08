@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { HelloService } from './hello.service';
 
 @Component({
   selector: 'spectatortest-root',
@@ -7,4 +8,7 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'demoapp';
+  helloMsg$ = this.helloService.sayHello();
+
+  constructor(private helloService: HelloService) {}
 }
